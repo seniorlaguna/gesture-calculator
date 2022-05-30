@@ -1,0 +1,15 @@
+contact:
+  title: "Kontakt"
+  url: "https://seniorlaguna.github.io/contact.html"
+
+terms:
+  title: "Nutzungsbedingungen"
+  url: "https://seniorlaguna.github.io/calculator/terms_de.html"
+
+privacy:
+  title: "Datenschutzrichtlinien"
+  url: "https://seniorlaguna.github.io/calculator/privacy_de.html"
+
+history:
+  still_empty: "Dein Verlauf ist noch leer :)"
+  clear: "Verlauf löschen"

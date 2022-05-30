@@ -1,40 +1,12 @@
 import 'dart:math';
 
 import 'package:calculator/calculator_framework.dart';
+import 'package:calculator/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
-// LIGHT THEME
-Color equalsBackground = const Color(0xFF4047F0);
-Color equalsColor = Colors.white;
-Color equalsOverlay = Colors.white.withOpacity(0.3);
-
-Color clearAllText = const Color(0xFFDE5050);
-Color clearAllOverlay = Colors.redAccent.withOpacity(0.3);
-
-Color spacingColor = const Color(0xFFC4C4C4);
-
-Color defaultText = Colors.black54;
-Color buttonBackgroundExtended = const Color(0xffF6F6F6);
-Color buttonBackgroundBase = Colors.white;
-
-Color operatorText = const Color(0xFF4C79EB);
-Color operatorBackground = Colors.white;
-
-Color screenAndHistory = Colors.white;
-
-Color removeHistoryItemAction = Colors.red;
-
-Color expressionText = Colors.black;
-Color resultText = Colors.grey;
-
-Color clearHistoryText = Colors.white;
-Color clearHistoryBackground = const Color(0xFF4047F0);
-
-Color historyHandle = Colors.grey;
-
 
 class App extends StatefulWidget {
   final double height;
@@ -53,10 +25,8 @@ class _AppState extends State<App> with TickerProviderStateMixin {
   AnimationController? controller;
   AnimationController? resultController;
 
-
-  final BannerAd bannerAd = BannerAd(size: AdSize.banner, adUnitId: "ca-app-pub-7519220681088057/7416942476", listener: BannerAdListener(
-    onAdFailedToLoad: (ad, error) => print(error),
-  ), request: const AdRequest());
+  bool adLoaded = false;
+  BannerAd? bannerAd;
 
   double tS = 30;
   double textSize = 24;
@@ -92,12 +62,12 @@ class _AppState extends State<App> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    bannerAd.load();
+    _loadAds();
 
-    controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
-    resultController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
+    controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 400));
+    resultController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 400));
 
     heightTween = Tween<double>(
             begin: 0.625 * widget.height + widget.bottomPadding,
@@ -110,13 +80,25 @@ class _AppState extends State<App> with TickerProviderStateMixin {
         Tween<double>(begin: 0.375, end: 1).animate(resultController!);
   }
 
+  void _loadAds() {
+    bannerAd = BannerAd(
+        size: AdSize.banner,
+        adUnitId: "ca-app-pub-7519220681088057/7416942476",
+        listener: BannerAdListener(
+            onAdFailedToLoad: (ad, error) => print(error),
+            onAdLoaded: (_) => setState(() {
+                  adLoaded = true;
+                })),
+        request: const AdRequest());
+    bannerAd!.load();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final CalculatorTheme theme =
+        Theme.of(context).extension<CalculatorTheme>()!;
+
     final size = MediaQuery.of(context).size.width / 4;
-/* 
-    print("height: ${widget.height}");
-    print("width: ${widget.width}");
-    print("bottom: ${widget.bottomPadding}"); */
 
     return Stack(
       children: [
@@ -334,8 +316,8 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                               "",
                             ],
                       styles: [],
-                      defaultBgColor: buttonBackgroundExtended,
-                      defaultTextColor: defaultText,
+                      defaultBgColor: theme.buttonBackgroundExtended,
+                      defaultTextColor: theme.defaultText,
                     ),
                   ),
                   Align(
@@ -347,7 +329,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                             height: heightTween!.value,
                             width: widthTween!.value,
                             child: Keyboard(
-                              textSize: textSize,
+                              textSize: textSize * 1.2,
                               rows: 5,
                               columns: 4,
                               keyboard: [
@@ -395,17 +377,19 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                                 "",
                               ],
                               styles: [
-                                KeyStyle(["="], equalsColor, equalsBackground,
-                                    overlayColor: equalsOverlay
-                                        ),
-                                KeyStyle(["C"], clearAllText, buttonBackgroundBase,
-                                    overlayColor:
-                                        clearAllOverlay),
-                                KeyStyle(["<-", "( )", "+", "-", "%", "×", "÷"],
-                                    operatorText, operatorBackground)
+                                KeyStyle(["="], theme.equalsColor,
+                                    theme.equalsBackground,
+                                    overlayColor: theme.equalsOverlay),
+                                KeyStyle(["C"], theme.clearAllText,
+                                    theme.buttonBackgroundBase,
+                                    overlayColor: theme.clearAllOverlay),
+                                KeyStyle(
+                                    ["<-", "( )", "+", "-", "%", "×", "÷"],
+                                    theme.operatorText,
+                                    theme.operatorBackground)
                               ],
-                              defaultTextColor: defaultText,
-                              defaultBgColor: buttonBackgroundBase,
+                              defaultTextColor: theme.defaultText,
+                              defaultBgColor: theme.buttonBackgroundBase,
                             ),
                           );
                         },
@@ -450,9 +434,9 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                     setState(() {});
                   },
                   child: AnimatedContainer(
-                    duration: Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
-                        color: screenAndHistory,
+                        color: theme.screenAndHistory,
                         boxShadow: resultController!.value == 0
                             ? null
                             : [
@@ -463,106 +447,155 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Align(
-                            alignment: Alignment.topRight,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                LimitedBox(maxHeight: 50, child: AdWidget(ad: bannerAd)),
-                                TextField(
-                                  controller: CalculatorCubit.of(context)
-                                      .expressionController,
-                                  onTap: CalculatorCubit.of(context)
-                                      .expressionController
-                                      .adoptCursorPosition,
-                                  textAlign: TextAlign.right,
-                                  style: TextStyle(
-                                    fontSize: resultTextSize,
-                                    color: expressionText,
+                          SizedBox(
+                            height: widget.height * 0.375 - 16,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (adLoaded) LimitedBox(
+                                      maxHeight: 50,
+                                      child: AdWidget(ad: bannerAd!)),
+                                  TextField(
+                                    controller: CalculatorCubit.of(context)
+                                        .expressionController,
+                                    onTap: CalculatorCubit.of(context)
+                                        .expressionController
+                                        .adoptCursorPosition,
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      fontSize: resultTextSize,
+                                      color: theme.expressionText,
+                                    ),
+                                    minLines: null,
+                                    maxLines: null,
+                                    readOnly: true,
+                                    showCursor: true,
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: "0"),
                                   ),
-                                  minLines: null,
-                                  maxLines: null,
-                                  readOnly: true,
-                                  showCursor: true,
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none, hintText: "0"),
-                                ),
-                                TextField(
-                                  controller: CalculatorCubit.of(context)
-                                      .resultController,
-                                  textAlign: TextAlign.right,
-                                  style: TextStyle(
-                                    fontSize: resultTextSize,
-                                    color: resultText,
+                                  TextField(
+                                    controller: CalculatorCubit.of(context)
+                                        .resultController,
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      fontSize: resultTextSize,
+                                      color: theme.resultText,
+                                    ),
+                                    minLines: null,
+                                    maxLines: null,
+                                    readOnly: true,
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none),
                                   ),
-                                  minLines: null,
-                                  maxLines: null,
-                                  readOnly: true,
-                                  decoration:
-                                      InputDecoration(border: InputBorder.none),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                          resultController!.value == 0 ? Spacer() : Expanded(child: BlocBuilder<CalculatorCubit, CalculatorState>(
-                            builder:(context, state) {
-
-                              if (state.history.isEmpty) {
-                                return Center(child: Text("Dein Verlauf ist noch leer :)"),);
-                              }
-
-                              return ListView.separated(
-                                separatorBuilder: (context, index) => Divider(),
-                              itemBuilder: (context, i) {
-                                print(state.history[i]);
-                                return Slidable(
-                                  key: ValueKey(i),
-                                  child: ListTile(title: Text(state.history[i].replaceAll("#", "")), onTap: () {
-                                    CalculatorCubit.of(context).insertFromHistory(i);
-                                  },),
-                                  endActionPane: ActionPane(motion: ScrollMotion(), children: [
-                                    SlidableAction(onPressed: (context) {
-                                      CalculatorCubit.of(context).removeFromHistory(i);
-                                    }, backgroundColor: removeHistoryItemAction, icon: Icons.delete,)
-                                  ]),
-                                  );
-                              },
-                              itemCount: state.history.length,
-                              );
-                            },
-                          )),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AnimatedSwitcher(
-                                duration: Duration(milliseconds: 400),
-                                child: resultController!.value == 0
-                                    ? Container(
-                                        key: ValueKey(1),
-                                      )
-                                    : Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: TextButton(onPressed: () {
-                                            CalculatorCubit.of(context).clearHistory();
-                                          }, child: Text("Verlauf löschen"), style: TextButton.styleFrom(
-                                            backgroundColor: clearHistoryBackground,
-                                            primary: clearHistoryText,
-                                            minimumSize: const Size.fromHeight(50),
-                                            textStyle: TextStyle(fontSize: 18)
-                                          ),),
+                          resultController!.value == 0
+                              ? const Spacer()
+                              : Expanded(child:
+                                  BlocBuilder<CalculatorCubit, CalculatorState>(
+                                  builder: (context, state) {
+                                    if (state.history.isEmpty) {
+                                      return Center(
+                                          child: Text(
+                                        FlutterI18n.translate(
+                                            context, "history.still_empty"),
+                                        style: TextStyle(
+                                          color: theme.historyItem,
                                         ),
-                                        Container(
-                                            key: ValueKey(2),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: historyHandle),
-                                            height: 8,
-                                            width: widget.width / 3),
-                                      ],
-                                    )),
-                          )
+                                      ));
+                                    }
+
+                                    return ListView.separated(
+                                      separatorBuilder: (context, index) =>
+                                          Divider(),
+                                      itemBuilder: (context, i) {
+                                        return Slidable(
+                                          key: ValueKey(i),
+                                          child: ListTile(
+                                            title: Text(
+                                                state.history[i]
+                                                    .replaceAll("#", ""),
+                                                style: TextStyle(
+                                                    color: theme.historyItem)),
+                                            onTap: () {
+                                              CalculatorCubit.of(context)
+                                                  .insertFromHistory(i);
+                                            },
+                                          ),
+                                          endActionPane: ActionPane(
+                                              motion: ScrollMotion(),
+                                              children: [
+                                                SlidableAction(
+                                                  onPressed: (context) {
+                                                    CalculatorCubit.of(context)
+                                                        .removeFromHistory(i);
+                                                  },
+                                                  backgroundColor: theme
+                                                      .removeHistoryItemAction,
+                                                  icon: Icons.delete,
+                                                )
+                                              ]),
+                                        );
+                                      },
+                                      itemCount: state.history.length,
+                                    );
+                                  },
+                                )),
+                          if (resultHeightTween!.value > 0.5)
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: AnimatedSwitcher(
+                                  duration: Duration(milliseconds: 400),
+                                  child: resultController!.value == 0
+                                      ? Container(
+                                          key: ValueKey(1),
+                                        )
+                                      : Column(
+                                          children: [
+                                            if (resultController!.value > 0.5)
+                                              FadeTransition(
+                                                opacity: resultController!,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: TextButton(
+                                                    onPressed: () {
+                                                      CalculatorCubit.of(
+                                                              context)
+                                                          .clearHistory();
+                                                    },
+                                                    child: Text(
+                                                        FlutterI18n.translate(
+                                                            context,
+                                                            "history.clear")),
+                                                    style: TextButton.styleFrom(
+                                                        backgroundColor: theme
+                                                            .clearHistoryBackground,
+                                                        primary: theme
+                                                            .clearHistoryText,
+                                                        minimumSize: const Size
+                                                            .fromHeight(50),
+                                                        textStyle: TextStyle(
+                                                            fontSize: 18)),
+                                                  ),
+                                                ),
+                                              ),
+                                            Container(
+                                                key: ValueKey(2),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                    color: theme.historyHandle),
+                                                height: 8,
+                                                width: widget.width / 3),
+                                          ],
+                                        )),
+                            )
                         ],
                       ),
                     ),
@@ -625,6 +658,9 @@ class Keyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final CalculatorTheme theme =
+        Theme.of(context).extension<CalculatorTheme>()!;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -643,10 +679,13 @@ class Keyboard extends StatelessWidget {
                               CalculatorCubit.clearOne(context);
                             } else if (keyboard[i * columns + j] == "=") {
                               CalculatorCubit.equals(context);
-                            } else if (keyboard[i * columns + j] == "RAD" || keyboard[i * columns + j] == "DEG") {
-                              CalculatorCubit.of(context).setUseRadians(!CalculatorCubit.of(context).state.useRadians);
-                            } 
-                            else {
+                            } else if (keyboard[i * columns + j] == "RAD" ||
+                                keyboard[i * columns + j] == "DEG") {
+                              CalculatorCubit.of(context).setUseRadians(
+                                  !CalculatorCubit.of(context)
+                                      .state
+                                      .useRadians);
+                            } else {
                               CalculatorCubit.insert(
                                   context, keyboardToken[i * columns + j]);
                             }
@@ -664,7 +703,7 @@ class Keyboard extends StatelessWidget {
                                       borderRadius:
                                           BorderRadius.all(Radius.zero))),
                               side: MaterialStateProperty.all(
-                                  BorderSide(color: spacingColor, width: 0.5))),
+                                  BorderSide(color: theme.spacingColor, width: 0.5))),
                           child: Center(
                               child: AnimatedSwitcher(
                             transitionBuilder: (child, animation) {
@@ -680,13 +719,22 @@ class Keyboard extends StatelessWidget {
                                     styles.getTextColor(text, defaultTextColor);
 
                                 if (text == "<-") {
-                                  return Icon(Icons.backspace_outlined, color: color);
-                                }  else if (text == "RAD" || text == "DEG") {
-                                  return BlocBuilder<CalculatorCubit, CalculatorState>(builder: (context, state) {
-                                    return Text(state.useRadians ? "RAD" : "DEG", key: ValueKey(text), style: TextStyle(fontSize: textSize, color: color));
+                                  return Icon(Icons.backspace_outlined,
+                                      color: color);
+                                } else if (text == "RAD" || text == "DEG") {
+                                  return BlocBuilder<CalculatorCubit,
+                                          CalculatorState>(
+                                      builder: (context, state) {
+                                    return Text(
+                                        state.useRadians ? "RAD" : "DEG",
+                                        key: ValueKey(text),
+                                        style: TextStyle(
+                                            fontSize: textSize, color: color));
                                   });
                                 } else {
-                                  return Text(text, style: TextStyle(fontSize: textSize, color: color));
+                                  return Text(text,
+                                      style: TextStyle(
+                                          fontSize: textSize, color: color));
                                 }
                               },
                             ),
