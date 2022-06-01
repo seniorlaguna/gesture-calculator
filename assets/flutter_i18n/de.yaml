@@ -1,3 +1,6 @@
+app:
+  title: "Taschenrechner"
+
 contact:
   title: "Kontakt"
   url: "https://seniorlaguna.github.io/contact.html"
@@ -9,6 +12,9 @@ terms:
 privacy:
   title: "Datenschutzrichtlinien"
   url: "https://seniorlaguna.github.io/calculator/privacy_de.html"
+
+about:
+  title: "Über"
 
 history:
   still_empty: "Dein Verlauf ist noch leer :)"

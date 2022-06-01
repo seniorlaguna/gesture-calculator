@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:calculator/calculator_framework.dart';
@@ -85,7 +86,6 @@ class _AppState extends State<App> with TickerProviderStateMixin {
         size: AdSize.banner,
         adUnitId: "ca-app-pub-7519220681088057/7416942476",
         listener: BannerAdListener(
-            onAdFailedToLoad: (ad, error) => print(error),
             onAdLoaded: (_) => setState(() {
                   adLoaded = true;
                 })),
@@ -159,7 +159,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
               },
               child: Stack(
                 children: [
-                  Container(
+                  SizedBox(
                     width: size * 4,
                     child: Keyboard(
                       textSize: textSize,
@@ -243,15 +243,15 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                       keyboardToken: keyboardInverted
                           ? [
                               "e^",
-                              "asin(",
-                              "acos(",
-                              "atan(",
-                              "acot(",
+                              "sin⁻¹(",
+                              "cos⁻¹(",
+                              "tan⁻¹(",
+                              "cot⁻¹(",
                               "10^",
-                              "asinh(",
-                              "acosh(",
-                              "atanh(",
-                              "acoth(",
+                              "sinh⁻¹(",
+                              "cosh⁻¹(",
+                              "tanh⁻¹(",
+                              "coth⁻¹(",
                               "^2",
                               "",
                               "",
@@ -315,7 +315,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                               "",
                               "",
                             ],
-                      styles: [],
+                      styles: const [],
                       defaultBgColor: theme.buttonBackgroundExtended,
                       defaultTextColor: theme.defaultText,
                     ),
@@ -325,7 +325,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                       child: AnimatedBuilder(
                         animation: controller!,
                         builder: (context, child) {
-                          return Container(
+                          return SizedBox(
                             height: heightTween!.value,
                             width: widthTween!.value,
                             child: Keyboard(
@@ -336,44 +336,44 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                                 "C",
                                 "<-",
                                 "( )",
-                                "×",
+                                "÷",
                                 "7",
                                 "8",
                                 "9",
-                                "÷",
+                                "×",
                                 "4",
                                 "5",
                                 "6",
-                                "+",
+                                "-",
                                 "1",
                                 "2",
                                 "3",
-                                "-",
+                                "+",
                                 "%",
                                 "0",
-                                ",",
+                                Platform.localeName.startsWith("de") ? "," : ".",
                                 "=",
                               ],
                               keyboardToken: [
                                 "",
                                 "",
-                                ")",
-                                "*",
+                                "()",
+                                "/",
                                 "7",
                                 "8",
                                 "9",
-                                "/",
+                                "*",
                                 "4",
                                 "5",
                                 "6",
-                                "+",
+                                "-",
                                 "1",
                                 "2",
                                 "3",
-                                "-",
+                                "+",
                                 "%",
                                 "0",
-                                ",",
+                                Platform.localeName.startsWith("de") ? "," : ".",
                                 "",
                               ],
                               styles: [
@@ -493,41 +493,31 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          resultController!.value == 0
-                              ? const Spacer()
-                              : Expanded(child:
+                          if (resultHeightTween!.value > 0.5) Expanded(child:
                                   BlocBuilder<CalculatorCubit, CalculatorState>(
                                   builder: (context, state) {
                                     if (state.history.isEmpty) {
                                       return Center(
-                                          child: Text(
-                                        FlutterI18n.translate(
-                                            context, "history.still_empty"),
-                                        style: TextStyle(
-                                          color: theme.historyItem,
-                                        ),
-                                      ));
+                                          child: FadeTransition(
+                                            opacity: resultController!,
+                                            child: Text(
+                                                                                  FlutterI18n.translate(
+                                              context, "history.still_empty"),
+                                                                                  style: TextStyle(
+                                            color: theme.historyItem,
+                                                                                  ),
+                                                                                ),
+                                          ));
                                     }
 
                                     return ListView.separated(
                                       separatorBuilder: (context, index) =>
-                                          Divider(),
+                                          const Divider(),
                                       itemBuilder: (context, i) {
                                         return Slidable(
                                           key: ValueKey(i),
-                                          child: ListTile(
-                                            title: Text(
-                                                state.history[i]
-                                                    .replaceAll("#", ""),
-                                                style: TextStyle(
-                                                    color: theme.historyItem)),
-                                            onTap: () {
-                                              CalculatorCubit.of(context)
-                                                  .insertFromHistory(i);
-                                            },
-                                          ),
                                           endActionPane: ActionPane(
-                                              motion: ScrollMotion(),
+                                              motion: const ScrollMotion(),
                                               children: [
                                                 SlidableAction(
                                                   onPressed: (context) {
@@ -539,6 +529,18 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                                                   icon: Icons.delete,
                                                 )
                                               ]),
+                                          child: ListTile(
+                                            trailing: Text(
+                                                state.history[i]
+                                                    .replaceAll("#", ""),
+                                                style: TextStyle(
+                                                    fontSize: 24,
+                                                    color: theme.historyItem)),
+                                            onTap: () {
+                                              CalculatorCubit.of(context)
+                                                  .insertFromHistory(i);
+                                            },
+                                          ),
                                         );
                                       },
                                       itemCount: state.history.length,
@@ -549,14 +551,10 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: AnimatedSwitcher(
-                                  duration: Duration(milliseconds: 400),
-                                  child: resultController!.value == 0
-                                      ? Container(
-                                          key: ValueKey(1),
-                                        )
-                                      : Column(
+                                  duration: const Duration(milliseconds: 400),
+                                  child: Column(
                                           children: [
-                                            if (resultController!.value > 0.5)
+                                            if (resultHeightTween!.value > 0.5)
                                               FadeTransition(
                                                 opacity: resultController!,
                                                 child: Padding(
@@ -568,10 +566,6 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                                                               context)
                                                           .clearHistory();
                                                     },
-                                                    child: Text(
-                                                        FlutterI18n.translate(
-                                                            context,
-                                                            "history.clear")),
                                                     style: TextButton.styleFrom(
                                                         backgroundColor: theme
                                                             .clearHistoryBackground,
@@ -579,13 +573,17 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                                                             .clearHistoryText,
                                                         minimumSize: const Size
                                                             .fromHeight(50),
-                                                        textStyle: TextStyle(
+                                                        textStyle: const TextStyle(
                                                             fontSize: 18)),
+                                                    child: Text(
+                                                        FlutterI18n.translate(
+                                                            context,
+                                                            "history.clear")),
                                                   ),
                                                 ),
                                               ),
                                             Container(
-                                                key: ValueKey(2),
+                                                key: const ValueKey(2),
                                                 decoration: BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -699,7 +697,7 @@ class Keyboard extends StatelessWidget {
                               padding:
                                   MaterialStateProperty.all(EdgeInsets.zero),
                               shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
+                                  const RoundedRectangleBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.zero))),
                               side: MaterialStateProperty.all(
@@ -708,9 +706,10 @@ class Keyboard extends StatelessWidget {
                               child: AnimatedSwitcher(
                             transitionBuilder: (child, animation) {
                               return ScaleTransition(
-                                  child: child, scale: animation);
+                                  scale: animation,
+                                  child: child);
                             },
-                            duration: Duration(milliseconds: 200),
+                            duration: const Duration(milliseconds: 200),
                             child: Builder(
                               key: ValueKey(keyboard[i * columns + j]),
                               builder: (context) {

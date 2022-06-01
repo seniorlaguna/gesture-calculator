@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,12 +19,14 @@ class CalculatorState extends Equatable {
 class CalculatorCubit extends HydratedCubit<CalculatorState> {
   
   final String delimiter;
+  final bool germanStyle;
   final CalculatorTextEditingController expressionController;
   final CalculatorTextEditingController resultController;
   
-  CalculatorCubit(CalculatorState state, this.delimiter) : 
-  expressionController = CalculatorTextEditingController(expression: [], delimiter: delimiter), 
-  resultController = CalculatorTextEditingController(expression: [], delimiter: delimiter),
+  CalculatorCubit(CalculatorState state, this.germanStyle) : 
+  delimiter = germanStyle ? "." : ",",
+  expressionController = CalculatorTextEditingController(expression: [], dotToken: germanStyle ? "," : ".", delimiterToken: germanStyle ? "." : ","), 
+  resultController = CalculatorTextEditingController(expression: [], dotToken: germanStyle ? "," : ".", delimiterToken: germanStyle ? "." : ","),
   super(state) {
     MexpaFlutterPlatform.instance.setDecimalPlaces(state.decimalPlaces);
     MexpaFlutterPlatform.instance.setUseRadians(state.useRadians);
@@ -46,12 +46,13 @@ class CalculatorCubit extends HydratedCubit<CalculatorState> {
   }
 
   void clearHistory() {
-    emit(CalculatorState(state.decimalPlaces, state.useRadians, []));
+    emit(CalculatorState(state.decimalPlaces, state.useRadians, const []));
   }
 
   void insertFromHistory(int index) {
     List<String> newExpression = state.history[index].split("#");
     expressionController.setExpression(newExpression);
+    _showPreview();
   }
 
   void removeFromHistory(int index) {
@@ -60,21 +61,41 @@ class CalculatorCubit extends HydratedCubit<CalculatorState> {
     emit(CalculatorState(state.decimalPlaces, state.useRadians, newHistory));
   } 
 
+  String _removeDelimiter(String expression) => expression.replaceAll(delimiter, "");
+
+  String _prepareForCalculation(String expression) {
+    expression = _removeDelimiter(expression);
+    if (germanStyle) {
+      expression = expression.replaceAll(",", ".");
+    }
+    return expression;
+  }
+
+  String _prepareForDisplay(String expression) {
+    if (!germanStyle) return expression;
+    return expression.replaceAll(".", ",");
+  }
+
   static CalculatorCubit of(BuildContext context) => BlocProvider.of<CalculatorCubit>(context);
 
   Future<void> _showPreview() async {
-    String expression = expressionController.text.replaceAll(delimiter, "").replaceAll(",", ".");
+    String expression = _prepareForCalculation(expressionController.text);
     String? result = await MexpaFlutterPlatform.instance.eval(expression);
     resultController.clearAll();
     if (result != null) {
       if (result == expression) return;
       resultController.clearAll();
-      resultController.insertNumber(result.replaceAll(".", ","));
+      resultController.insertNumber(_prepareForDisplay(result));
     }
   }
 
   static Future<void> insert(BuildContext context, String token) async {
-    of(context).expressionController.insert(token);
+
+    if (token == "()") {
+      of(context).expressionController.insertBracket();
+    } else {
+      of(context).expressionController.insert(token);
+    }
     of(context)._showPreview();
   }
   
@@ -125,9 +146,60 @@ class CalculatorTextEditingController extends TextEditingController {
   static const String _cursorSymbol = "|";
 
   final List<String> expression;
-  final String delimiter;
+  final String delimiterToken;
+  final String dotToken;
 
-  CalculatorTextEditingController({required this.expression, this.delimiter = " "});
+  CalculatorTextEditingController({required this.expression, required this.dotToken, this.delimiterToken = " ",});
+
+  void insertBracket() {
+    String? previousToken;
+
+    int baseOffset = selection.baseOffset;
+
+    // cursor at end of line
+    if (baseOffset == -1) {
+      if (expression.isNotEmpty) {
+        previousToken = expression.last;
+      }
+    } 
+    // not first 
+    else if (baseOffset > 0) {
+      int charCount = 0;
+      for (int i = 0; i < expression.length; i++) {
+        charCount += expression[i].length;
+        if (charCount == baseOffset) {
+          previousToken = expression[i];
+          break;
+        }
+      }
+    }
+
+    //print("previous token = $previousToken");
+
+    bool isFirstToken = (previousToken == null);
+    int openBracketCount = expression.where((element) => element.contains("(")).length;
+    int closedBracketCount = expression.where((element) => element.contains(")")).length;
+    //print("open brackets: $openBracketCount");
+    //print("closed brackets: $closedBracketCount");
+
+    if (isFirstToken) {
+      //print("first token");
+      insert("(");
+    } else if (previousToken == "(" || previousToken.endsWith("(")) {
+      //print("previous (");
+      insert("(");
+    } else if (_isOperator(previousToken)) {
+      //print("after operator");
+      insert("(");
+    } else if (openBracketCount <= closedBracketCount) {
+      //print("more closed brackets");
+      insert("(");
+    }
+    else {
+      // insert open bracket
+      insert(")");
+    }
+  }
 
   void _f(String? insert) {
     int baseOffset = selection.baseOffset;
@@ -204,8 +276,8 @@ class CalculatorTextEditingController extends TextEditingController {
 
 
       if (pos == currentLength) {
-        if (s != delimiter) return;
-        pos = pos - delimiter.length;
+        if (s != delimiterToken) return;
+        pos = pos - delimiterToken.length;
       }
       if (previousLenght < pos && pos < currentLength) {
         pos = currentLength;
@@ -222,13 +294,13 @@ class CalculatorTextEditingController extends TextEditingController {
     for (int i = expression.length - 1; i >= 0; i--) {
       String current = expression[i];
 
-      if (current == delimiter) continue;
+      if (current == delimiterToken) continue;
 
       if (current == _cursorSymbol) {}
       else if (_isDigit(current) && !_isAfterDot(i)) {
 
         if (digitsTillNow == 3) {
-          result.insert(0, delimiter);
+          result.insert(0, delimiterToken);
           digitsTillNow = 1;
         } else {
           digitsTillNow++;
@@ -249,10 +321,14 @@ class CalculatorTextEditingController extends TextEditingController {
   bool _isAfterDot(int i) {
     for (int j = i; j >= 0; j--) {
       String current = expression[j];
-      if (current == ",") return true;
-      if (!_isDigit(current) && current != delimiter && current != _cursorSymbol) return false;
+      if (current == dotToken) return true;
+      if (!_isDigit(current) && current != delimiterToken && current != _cursorSymbol) return false;
     }
 
     return false;
+  }
+  
+  bool _isOperator(String previousToken) {
+    return "+,-,*,/,^".split(",").contains(previousToken);
   }
 }

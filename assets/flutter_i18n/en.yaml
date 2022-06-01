@@ -1,3 +1,6 @@
+app:
+  title: "Calculator"
+
 contact:
   title: "Contact"
   url: "https://seniorlaguna.github.io/contact.html"
@@ -9,6 +12,9 @@ terms:
 privacy:
   title: "Privacy Policy"
   url: "https://seniorlaguna.github.io/calculator/privacy_en.html"
+
+about:
+  title: "About"
 
 history:
   still_empty: "Your history is still empty :)"

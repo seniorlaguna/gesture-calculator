@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:calculator/calculator_framework.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,15 +34,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
+    final bool isGerman = Platform.localeName.startsWith("de");
+
     return BlocProvider<CalculatorCubit>(
-      create: (context) => CalculatorCubit(const CalculatorState(6, true, []), "."),
+      create: (context) => CalculatorCubit(const CalculatorState(6, true, []), isGerman),
       child: MaterialApp(
         title: "Calculator",
         localizationsDelegates: [
           FlutterI18nDelegate(
             translationLoader: FileTranslationLoader(decodeStrategies: [YamlDecodeStrategy()]),
           ),
-          GlobalMaterialLocalizations.delegate,
+          ...GlobalMaterialLocalizations.delegates,
           GlobalWidgetsLocalizations.delegate
         ],
         supportedLocales: const [
@@ -48,7 +53,7 @@ class MyApp extends StatelessWidget {
           Locale("en")
         ],
         theme: ThemeData.light()
-            .copyWith(textTheme: GoogleFonts.robotoTextTheme(), extensions: [
+            .copyWith(textTheme: GoogleFonts.sourceSansProTextTheme(), extensions: [
           CalculatorTheme(
               const Color(0xFF4047F0),
               Colors.white,
@@ -72,7 +77,11 @@ class MyApp extends StatelessWidget {
               Colors.black)
         ]),
         darkTheme: ThemeData.dark()
-            .copyWith(textTheme: GoogleFonts.robotoTextTheme(), extensions: [
+            .copyWith(textTheme: GoogleFonts.sourceSansProTextTheme().copyWith(
+              headline5: const TextStyle(color: Colors.white),
+              bodyText2: const TextStyle(color: Colors.white),
+              caption: const TextStyle(color: Colors.white)
+            ), extensions: [
           CalculatorTheme(
               const Color(0xFF4047F0),
               Colors.white,
@@ -136,6 +145,17 @@ class MyApp extends StatelessWidget {
                               if (await canLaunchUrlString(url)) {
                                 launchUrlString(url);
                               }
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.people),
+                            title: Text(FlutterI18n.translate(context, "about.title"), style: TextStyle(color: theme.drawerText)),
+                            onTap: () {
+                              showAboutDialog(
+                                applicationName: FlutterI18n.translate(context, "app.title"),
+                                applicationVersion: "1.0",
+                                applicationLegalese: "Thanks for using our app <3",
+                                context: context);
                             },
                           ),
                         ],
