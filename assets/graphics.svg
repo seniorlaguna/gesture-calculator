@@ -134,34 +134,34 @@
        xml:space="preserve"
        transform="matrix(1.8825996,0,0,1.8825996,-60.302386,-96.54927)"
        id="text1828"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1830);fill:#ffffff;fill-opacity:1;stroke:none"><tspan
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1830);display:inline;fill:#ffffff;fill-opacity:1;stroke:none"><tspan
          x="35.212891"
          y="84.381885"
-         id="tspan1549">+</tspan></text>
+         id="tspan1613">+</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(3.0451819,0,0,1.6965606,-34.731018,-83.236607)"
        id="text1886"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1888);fill:#ffffff;fill-opacity:1;stroke:none"><tspan
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1888);display:inline;fill:#ffffff;fill-opacity:1;stroke:none"><tspan
          x="35.212891"
          y="84.381885"
-         id="tspan1551">-</tspan></text>
+         id="tspan1615">-</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(1.8345463,0,0,1.8345463,-57.823793,-31.658261)"
        id="text1892"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1894);fill:#ffffff;fill-opacity:1;stroke:none"><tspan
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1894);display:inline;fill:#ffffff;fill-opacity:1;stroke:none"><tspan
          x="35.212891"
          y="84.381885"
-         id="tspan1553">×</tspan></text>
+         id="tspan1617">×</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(1.8396639,0,0,1.8396639,5.2650685,-32.024924)"
        id="text1898"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1900);fill:#ffffff;fill-opacity:1;stroke:none"><tspan
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1900);display:inline;fill:#ffffff;fill-opacity:1;stroke:none"><tspan
          x="35.212891"
          y="84.381885"
-         id="tspan1555">=</tspan></text>
+         id="tspan1619">=</tspan></text>
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke-width:0.264583"
        id="rect2684"
@@ -191,53 +191,53 @@
        xml:space="preserve"
        transform="matrix(0.94385622,0,0,0.94385622,248.52255,19.436893)"
        id="text535"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect549);fill:#ffffff;fill-opacity:1;stroke:none"><tspan
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect549);display:inline;fill:#ffffff;fill-opacity:1;stroke:none"><tspan
          x="35.212891"
          y="84.381885"
-         id="tspan1557">+</tspan></text>
+         id="tspan1621">+</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(1.5267261,0,0,0.85058409,261.34296,26.111302)"
        id="text539"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect551);fill:#ffffff;fill-opacity:1;stroke:none"><tspan
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect551);display:inline;fill:#ffffff;fill-opacity:1;stroke:none"><tspan
          x="35.212891"
          y="84.381885"
-         id="tspan1559">-</tspan></text>
+         id="tspan1623">-</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.91976432,0,0,0.91976432,249.76521,51.970514)"
        id="text543"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect553);fill:#ffffff;fill-opacity:1;stroke:none"><tspan
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect553);display:inline;fill:#ffffff;fill-opacity:1;stroke:none"><tspan
          x="35.212891"
          y="84.381885"
-         id="tspan1561">×</tspan></text>
+         id="tspan1625">×</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.92233007,0,0,0.92233007,281.39531,51.786685)"
        id="text547"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect555);fill:#ffffff;fill-opacity:1;stroke:none"><tspan
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect555);display:inline;fill:#ffffff;fill-opacity:1;stroke:none"><tspan
          x="35.212891"
          y="84.381885"
-         id="tspan1563">=</tspan></text>
+         id="tspan1627">=</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.43069446,0,0,0.43069446,-236.46447,-21.356613)"
        id="text1475"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1477);fill:#000080;fill-opacity:1;stroke:none"><tspan
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1477);display:inline;fill:#000080;fill-opacity:1;stroke:none"><tspan
          x="1395.7129"
          y="302.64146"
-         id="tspan1567"><tspan
+         id="tspan1631"><tspan
            style="font-family:Thonburi;-inkscape-font-specification:Thonburi"
-           id="tspan1565">Einfach rechnen.</tspan></tspan></text>
+           id="tspan1629">Einfach rechnen.</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.43069446,0,0,0.43069446,-236.57018,-21.488941)"
        id="text768"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect770);fill:#4047f0;fill-opacity:1;stroke:none"><tspan
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect770);display:inline;fill:#4047f0;fill-opacity:1;stroke:none"><tspan
          x="1395.7129"
          y="302.64146"
-         id="tspan1571"><tspan
+         id="tspan1635"><tspan
            style="font-family:Thonburi;-inkscape-font-specification:Thonburi"
-           id="tspan1569">Einfach rechnen.</tspan></tspan></text>
+           id="tspan1633">Einfach rechnen.</tspan></tspan></text>
   </g>
 </svg>

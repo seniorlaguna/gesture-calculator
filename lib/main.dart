@@ -18,8 +18,8 @@ import 'app.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
-  MobileAds.instance.updateRequestConfiguration(RequestConfiguration(
-      testDeviceIds: ["48A5AEC0AD67D16D5285734B61C36518"]));
+  //MobileAds.instance.updateRequestConfiguration(RequestConfiguration(
+  //    testDeviceIds: ["48A5AEC0AD67D16D5285734B61C36518"]));
 
   final storage = await HydratedStorage.build(
       storageDirectory: await getApplicationDocumentsDirectory());
