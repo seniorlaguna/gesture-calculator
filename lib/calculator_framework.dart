@@ -9,11 +9,12 @@ class CalculatorState extends Equatable {
   final int decimalPlaces;
   final bool useRadians;
   final List<String> history;
+  final bool askedForReview;
 
-  const CalculatorState(this.decimalPlaces, this.useRadians, this.history);
+  const CalculatorState(this.decimalPlaces, this.useRadians, this.history, this.askedForReview);
 
   @override
-  List<Object?> get props => [decimalPlaces, useRadians, history];
+  List<Object?> get props => [decimalPlaces, useRadians, history, askedForReview];
 }
 
 class CalculatorCubit extends HydratedCubit<CalculatorState> {
@@ -32,21 +33,25 @@ class CalculatorCubit extends HydratedCubit<CalculatorState> {
     MexpaFlutterPlatform.instance.setUseRadians(state.useRadians);
   }
   
+  void setAskedForReview() {
+    emit(CalculatorState(state.decimalPlaces, state.useRadians, state.history, true));
+  }
+
   void setDecimalPlaces(int decimalPlaces) {
     if (decimalPlaces < 1) return;
     MexpaFlutterPlatform.instance.setDecimalPlaces(decimalPlaces);
-    emit(CalculatorState(decimalPlaces, state.useRadians, state.history));
+    emit(CalculatorState(decimalPlaces, state.useRadians, state.history, state.askedForReview));
     _showPreview();
   }
 
   void setUseRadians(bool useRadians) {
     MexpaFlutterPlatform.instance.setUseRadians(useRadians);
-    emit(CalculatorState(state.decimalPlaces, useRadians, state.history));
+    emit(CalculatorState(state.decimalPlaces, useRadians, state.history, state.askedForReview));
     _showPreview();
   }
 
   void clearHistory() {
-    emit(CalculatorState(state.decimalPlaces, state.useRadians, const []));
+    emit(CalculatorState(state.decimalPlaces, state.useRadians, const [], state.askedForReview));
   }
 
   void insertFromHistory(int index) {
@@ -58,7 +63,7 @@ class CalculatorCubit extends HydratedCubit<CalculatorState> {
   void removeFromHistory(int index) {
     List<String> newHistory = List.from(state.history);
     newHistory.removeAt(index);
-    emit(CalculatorState(state.decimalPlaces, state.useRadians, newHistory));
+    emit(CalculatorState(state.decimalPlaces, state.useRadians, newHistory, state.askedForReview));
   } 
 
   String _removeDelimiter(String expression) => expression.replaceAll(delimiter, "");
@@ -116,7 +121,7 @@ class CalculatorCubit extends HydratedCubit<CalculatorState> {
     if (result != null) {
       List<String> newHistory = List.from(cubit.state.history);
       newHistory.insert(0, cubit.expressionController.expression.join("#"));
-      cubit.emit(CalculatorState(cubit.state.decimalPlaces, cubit.state.useRadians, newHistory));
+      cubit.emit(CalculatorState(cubit.state.decimalPlaces, cubit.state.useRadians, newHistory, cubit.state.askedForReview));
       cubit.expressionController.clearAll();
       cubit.resultController.clearAll();
       cubit.expressionController.insertNumber(result.replaceAll(".", ","));
@@ -128,7 +133,7 @@ class CalculatorCubit extends HydratedCubit<CalculatorState> {
   
   @override
   CalculatorState? fromJson(Map<String, dynamic> json) {
-    return CalculatorState(json["decimalPlaces"], json["useRadians"], json["history"]);
+    return CalculatorState(json["decimalPlaces"], json["useRadians"], json["history"], json["askedForReview"]);
   }
   
   @override
@@ -136,7 +141,8 @@ class CalculatorCubit extends HydratedCubit<CalculatorState> {
     return {
       "decimalPlaces" : state.decimalPlaces,
       "useRadians" : state.useRadians,
-      "history" : state.history
+      "history" : state.history,
+      "askedForReview" : state.askedForReview
     };
   }
 }

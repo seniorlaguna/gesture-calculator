@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
     final bool isGerman = Platform.localeName.startsWith("de");
 
     return BlocProvider<CalculatorCubit>(
-      create: (context) => CalculatorCubit(const CalculatorState(6, true, []), isGerman),
+      create: (context) => CalculatorCubit(const CalculatorState(6, true, [], false), isGerman),
       child: MaterialApp(
         title: "Calculator",
         localizationsDelegates: [
@@ -106,68 +106,12 @@ class MyApp extends StatelessWidget {
         ]),
         home: SafeArea(
             child: Scaffold(
-                drawer: Drawer(
-                  child: Builder(
-            
-                    builder: (context) {
-                      final CalculatorTheme theme = Theme.of(context).extension<CalculatorTheme>()!;
-
-
-                      return ListView(
-                        children: [
-                          ListTile(
-                              leading: Icon(Icons.person),
-                              title: Text(FlutterI18n.translate(context, "contact.title"), style: TextStyle(color: theme.drawerText),),
-                              onTap: () async {
-                                String url =
-                                    FlutterI18n.translate(context, "contact.url");
-                                if (await canLaunchUrlString(url)) {
-                                  launchUrlString(url);
-                                }
-                              }),
-                          ListTile(
-                            leading: Icon(Icons.casino),
-                            title: Text(FlutterI18n.translate(context, "terms.title"), style: TextStyle(color: theme.drawerText)),
-                            onTap: () async {
-                              String url =
-                                  FlutterI18n.translate(context, "terms.url");
-                              if (await canLaunchUrlString(url)) {
-                                launchUrlString(url);
-                              }
-                            },
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.lock),
-                            title: Text(FlutterI18n.translate(context, "privacy.title"), style: TextStyle(color: theme.drawerText)),
-                            onTap: () async {
-                              String url =
-                                  FlutterI18n.translate(context, "privacy.url");
-                              if (await canLaunchUrlString(url)) {
-                                launchUrlString(url);
-                              }
-                            },
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.people),
-                            title: Text(FlutterI18n.translate(context, "about.title"), style: TextStyle(color: theme.drawerText)),
-                            onTap: () {
-                              showAboutDialog(
-                                applicationName: FlutterI18n.translate(context, "app.title"),
-                                applicationVersion: "1.0",
-                                applicationLegalese: "Thanks for using our app <3",
-                                context: context);
-                            },
-                          ),
-                        ],
-                      );
-                    }
-                  ),
-                ),
+                drawer: const MyDrawer(),
                 body: Builder(builder: (context) {
                   return FutureBuilder(future: () async {
                     await SystemChrome.setEnabledSystemUIMode(
                         SystemUiMode.immersiveSticky);
-                    await Future.delayed(Duration(milliseconds: 500));
+                    await Future.delayed(const Duration(milliseconds: 500));
                   }(), builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       return App(
@@ -178,6 +122,73 @@ class MyApp extends StatelessWidget {
                     return Container();
                   });
                 }))),
+      ),
+    );
+  }
+}
+
+class MyDrawer extends StatelessWidget {
+  const MyDrawer({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: Builder(
+            
+        builder: (context) {
+          final CalculatorTheme theme = Theme.of(context).extension<CalculatorTheme>()!;
+
+
+          return ListView(
+            children: [
+              ListTile(
+                  leading: const Icon(Icons.person),
+                  title: Text(FlutterI18n.translate(context, "contact.title"), style: TextStyle(color: theme.drawerText),),
+                  onTap: () async {
+                    String url =
+                        FlutterI18n.translate(context, "contact.url");
+                    if (await canLaunchUrlString(url)) {
+                      launchUrlString(url);
+                    }
+                  }),
+              ListTile(
+                leading: const Icon(Icons.casino),
+                title: Text(FlutterI18n.translate(context, "terms.title"), style: TextStyle(color: theme.drawerText)),
+                onTap: () async {
+                  String url =
+                      FlutterI18n.translate(context, "terms.url");
+                  if (await canLaunchUrlString(url)) {
+                    launchUrlString(url);
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock),
+                title: Text(FlutterI18n.translate(context, "privacy.title"), style: TextStyle(color: theme.drawerText)),
+                onTap: () async {
+                  String url =
+                      FlutterI18n.translate(context, "privacy.url");
+                  if (await canLaunchUrlString(url)) {
+                    launchUrlString(url);
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.people),
+                title: Text(FlutterI18n.translate(context, "about.title"), style: TextStyle(color: theme.drawerText)),
+                onTap: () {
+                  showAboutDialog(
+                    applicationName: FlutterI18n.translate(context, "app.title"),
+                    applicationVersion: "1.0",
+                    applicationLegalese: "Thanks for using our app <3",
+                    context: context);
+                },
+              ),
+            ],
+          );
+        }
       ),
     );
   }

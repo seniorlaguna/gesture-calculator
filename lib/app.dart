@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 class App extends StatefulWidget {
   final double height;
@@ -64,6 +65,8 @@ class _AppState extends State<App> with TickerProviderStateMixin {
     super.initState();
 
     _loadAds();
+    
+    _askForReview();
 
     controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 400));
@@ -79,6 +82,16 @@ class _AppState extends State<App> with TickerProviderStateMixin {
         .animate(CurvedAnimation(parent: controller!, curve: curve));
     resultHeightTween =
         Tween<double>(begin: 0.375, end: 1).animate(resultController!);
+  }
+
+  void _askForReview() async {
+    var cubit = CalculatorCubit.of(context);
+    if (cubit.state.history.length < 10 || cubit.state.askedForReview) return;
+    
+    cubit.setAskedForReview();
+    if (await InAppReview.instance.isAvailable()) {
+      InAppReview.instance.requestReview();
+    }
   }
 
   void _loadAds() {
@@ -102,6 +115,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
 
     return Stack(
       children: [
+        // keyboard
         Align(
           alignment: Alignment.bottomCenter,
           child: SizedBox(
@@ -399,6 +413,8 @@ class _AppState extends State<App> with TickerProviderStateMixin {
             ),
           ),
         ),
+        
+        // display and history
         AnimatedBuilder(
             animation: resultController!,
             builder: (context, child) {
@@ -440,13 +456,14 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                         boxShadow: resultController!.value == 0
                             ? null
                             : [
-                                BoxShadow(offset: Offset(0, 1), blurRadius: 10)
+                                const BoxShadow(offset: Offset(0, 1), blurRadius: 10)
                               ]),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // display
                           SizedBox(
                             height: widget.height * 0.375 - 16,
                             child: SingleChildScrollView(
@@ -471,7 +488,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                                     maxLines: null,
                                     readOnly: true,
                                     showCursor: true,
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                         border: InputBorder.none,
                                         hintText: "0"),
                                   ),
@@ -486,13 +503,15 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                                     minLines: null,
                                     maxLines: null,
                                     readOnly: true,
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                         border: InputBorder.none),
                                   ),
                                 ],
                               ),
                             ),
                           ),
+                          
+                          // history
                           if (resultHeightTween!.value > 0.5) Expanded(child:
                                   BlocBuilder<CalculatorCubit, CalculatorState>(
                                   builder: (context, state) {
@@ -547,6 +566,8 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                                     );
                                   },
                                 )),
+                          
+                          // clear history button
                           if (resultHeightTween!.value > 0.5)
                             Padding(
                               padding: const EdgeInsets.all(8.0),
